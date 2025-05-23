@@ -16,3 +16,6 @@ frontend/dist
 *.out
 *.test
 backend/tmp
+
+.idea
+.vscode

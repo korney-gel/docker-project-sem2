@@ -12,6 +12,11 @@ services:
     security_opt:
       - no-new-privileges:true
     read_only: true
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   frontend:
     build:
@@ -23,3 +28,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
