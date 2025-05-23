@@ -3,6 +3,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 # Установка зависимостей
 COPY frontend/package*.json ./
 RUN npm ci
