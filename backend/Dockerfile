@@ -6,13 +6,15 @@ RUN apk add --no-cache git
 
 WORKDIR /app
 
-COPY backend/go.mod backend/go.sum ./
+COPY backend/go.mod backend/go.sum ./backend/
+WORKDIR /app/backend
 RUN go mod download
+
 
 COPY backend/ ./backend/
 
-# Сборка без тестов, оптимизированная
-WORKDIR /app/backend/cmd
+# Сборка из конкретного main.go
+WORKDIR /app/backend/cmd/api
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app
 
 # Этап запуска — минимальный образ
