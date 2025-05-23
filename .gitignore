@@ -17,3 +17,9 @@ vendor/
 .vscode/
 .DS_Store
 *.tgz
+node_modules
+dist
+.git
+*.log
+Dockerfile
+docker-compose.yml

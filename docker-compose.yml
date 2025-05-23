@@ -21,9 +21,5 @@ services:
     ports:
       - "80:80" # nginx по умолчанию
     restart: unless-stopped
-    tmpfs:
-      - /tmp
-      - /var/cache/nginx
     security_opt:
       - no-new-privileges:true
-    read_only: true

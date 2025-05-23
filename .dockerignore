@@ -1,0 +1,18 @@
+# Общие
+.git
+.gitignore
+.dockerignore
+README.md
+*.log
+
+# Node/Vue
+node_modules
+dist
+frontend/node_modules
+frontend/dist
+
+# Go
+*.exe
+*.out
+*.test
+backend/tmp
