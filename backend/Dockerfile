@@ -9,9 +9,10 @@ WORKDIR /app
 COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 
-COPY backend/ ./
+COPY backend/ ./backend/
 
 # Сборка без тестов, оптимизированная
+WORKDIR /app/backend/cmd
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app
 
 # Этап запуска — минимальный образ
