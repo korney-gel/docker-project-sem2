@@ -1,29 +1,23 @@
 # Этап сборки
 FROM golang:1.21-alpine AS builder
 
-# Обеспечение безопасности
 RUN apk add --no-cache git
 
 WORKDIR /app
 
-COPY backend/go.mod backend/go.sum ./backend/
-WORKDIR /app/backend
+COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 
+COPY backend/ ./
 
-COPY backend/ ./backend/
+WORKDIR /app/cmd/api
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /app/app
 
-# Сборка из конкретного main.go
-WORKDIR /app/backend/cmd/api
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app
-
-# Этап запуска — минимальный образ
+# Финальный образ
 FROM scratch
 
-# Копируем бинарник
 COPY --from=builder /app/app /app
 
-# Указываем пользователя (не root)
 USER 1001
 
 ENTRYPOINT ["/app"]
