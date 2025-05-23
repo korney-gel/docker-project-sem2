@@ -26,6 +26,9 @@ services:
     ports:
       - "80:80" # nginx по умолчанию
     restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
     security_opt:
       - no-new-privileges:true
     healthcheck:
