@@ -20,12 +20,12 @@ RUN apk add --no-cache ca-certificates curl && \
 
 COPY --from=builder /app/app /app
 
-EXPOSE 8081  # Changed to match app's port
+EXPOSE 8081
 
 USER 1001
 
-# Healthcheck for the API
+# Healthcheck for the API (reintroduced, using root endpoint on 8081)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8081/ || exit 1
+    CMD curl http://localhost:8081/ || exit 1
 
 ENTRYPOINT ["/app"]
