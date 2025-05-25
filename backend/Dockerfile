@@ -24,7 +24,6 @@ EXPOSE 8081
 
 USER 1001
 
-# Healthcheck for the API (reintroduced, using root endpoint on 8081)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl http://localhost:8081/ || exit 1
 
