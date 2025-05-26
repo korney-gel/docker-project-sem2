@@ -19,6 +19,14 @@ jobs:
           with:
             username: ${{ secrets.DOCKER_USER }}
             password: ${{ secrets.DOCKER_PASSWORD }}
+        - name: Scan backend image with Trivy
+          uses: aquasecurity/trivy-action@v0.16.1
+          with:
+            image-ref: ${{ github.repository }}-backend:latest
+            format: table
+            ignore-unfixed: true
+            vuln-type: os,library
+
         - name: Push Backend to DockerHub
           uses: docker/build-push-action@v4
           with:
@@ -26,6 +34,14 @@ jobs:
             file: ./backend/Dockerfile
             push: true
             tags: ${{ secrets.DOCKER_USER }}/docker-project-backend:latest
+
+        - name: Scan frontend image with Trivy
+          uses: aquasecurity/trivy-action@v0.16.1
+          with:
+            image-ref: ${{ github.repository }}-frontend:latest
+            format: table
+            ignore-unfixed: true
+            vuln-type: os,library
         - name: Push Frontend to DockerHub
           uses: docker/build-push-action@v4
           with:
