@@ -8,7 +8,7 @@ services:
       - "8081:8081"
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8081/" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/health" ]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -41,7 +41,7 @@ services:
     environment:
       - VUE_APP_API_URL=/api
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/momo-store/" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/momo-store/" ]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -55,6 +55,22 @@ services:
         limits:
           cpus: '0.5'
           memory: 256M
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+      target: dev
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    ports:
+      - "3000:5173"                 # localhost:3000 → dev-сервер
+    depends_on:
+      backend:
+        condition: service_healthy
+    profiles: [ "dev" ]
+    networks:
+      - app-network
 
 networks:
   app-network:
