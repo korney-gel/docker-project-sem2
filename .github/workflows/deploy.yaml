@@ -22,13 +22,15 @@ jobs:
         - name: Push Backend to DockerHub
           uses: docker/build-push-action@v4
           with:
-            context: ./backend/
+            context: .
+            file: ./backend/Dockerfile
             push: true
             tags: ${{ secrets.DOCKER_USER }}/docker-project-backend:latest
         - name: Push Frontend to DockerHub
           uses: docker/build-push-action@v4
           with:
-            context: ./frontend/
+            context: .
+            file: ./frontend/Dockerfile
             push: true
             tags: ${{ secrets.DOCKER_USER }}/docker-project-frontend:latest
 
