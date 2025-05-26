@@ -2,61 +2,71 @@ name: Docker Project Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build_and_push_to_docker_hub:
-      name: Push Docker image to DockerHub
-      runs-on: ubuntu-latest
-      steps:
-        - name: Check out the repo
-          uses: actions/checkout@v3
-        - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v2
-        - name: Login to Docker 
-          uses: docker/login-action@v2
-          with:
-            username: ${{ secrets.DOCKER_USER }}
-            password: ${{ secrets.DOCKER_PASSWORD }}
-        - name: Scan backend image with Trivy
-          uses: aquasecurity/trivy-action@v0.16.1
-          with:
-            image-ref: ${{ github.repository }}-backend:latest
-            format: table
-            ignore-unfixed: true
-            vuln-type: os,library
-
-        - name: Push Backend to DockerHub
-          uses: docker/build-push-action@v4
-          with:
-            context: .
-            file: ./backend/Dockerfile
-            push: true
-            tags: ${{ secrets.DOCKER_USER }}/docker-project-backend:latest
-
-        - name: Scan frontend image with Trivy
-          uses: aquasecurity/trivy-action@v0.16.1
-          with:
-            image-ref: ${{ github.repository }}-frontend:latest
-            format: table
-            ignore-unfixed: true
-            vuln-type: os,library
-        - name: Push Frontend to DockerHub
-          uses: docker/build-push-action@v4
-          with:
-            context: .
-            file: ./frontend/Dockerfile
-            push: true
-            tags: ${{ secrets.DOCKER_USER }}/docker-project-frontend:latest
-
-  run-with-docker-compose:
-    name: Push Docker image to DockerHub
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Build via Docker Compose
-        uses: hoverkraft-tech/compose-action@v2.2.0
+      - uses: actions/checkout@v3
+
+      - uses: docker/setup-buildx-action@v2
+
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build backend image
+        id: backend_build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./backend/Dockerfile
+          push: false
+          tags: backend:ci
+
+      - name: Scan backend with Trivy
+        uses: aquasecurity/trivy-action@v0.14.0
+        with:
+          image-ref: backend:ci
+          ignore-unfixed: true
+          format: table
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+      - name: Push backend to Docker Hub
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USER }}/docker-project-backend:latest
+
+
+      - name: Build frontend image
+        id: frontend_build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./frontend/Dockerfile
+          push: false
+          tags: frontend:ci
+
+      - name: Scan frontend with Trivy
+        uses: aquasecurity/trivy-action@v0.14.0
+        with:
+          image-ref: frontend:ci
+          ignore-unfixed: true
+          format: table
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+      - name: Push frontend to Docker Hub
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USER }}/docker-project-frontend:latest
