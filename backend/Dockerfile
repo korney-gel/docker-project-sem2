@@ -5,10 +5,10 @@ RUN apk add --no-cache git
 
 WORKDIR /app
 
-COPY backend/go.mod backend/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
-COPY backend/ ./
+COPY . .
 WORKDIR /app/cmd/api
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /app/app
 
