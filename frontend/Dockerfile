@@ -1,31 +1,23 @@
-# Build stage
+# ---------- build stage ----------
 FROM node:20-alpine AS builder
-
 WORKDIR /app
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
+
 COPY frontend/package*.json ./
-RUN npm ci && \
-    npm cache clean --force
+RUN npm ci && npm cache clean --force
 
 COPY frontend/ ./
 RUN npm run build
 
-# Final stage
-FROM nginx:alpine
 
-RUN rm -rf /usr/share/nginx/html/*
+# ---------- final stage ----------
+FROM nginxinc/nginx-unprivileged:stable-alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Добавляем кастомный Nginx-конфиг
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-
-# Healthcheck for Nginx
-#HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-#    CMD curl -f http://localhost/momo-store/ || exit 1
-
+EXPOSE 8080
+USER 101
 CMD ["nginx", "-g", "daemon off;"]
