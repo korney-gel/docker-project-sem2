@@ -5,6 +5,7 @@ RUN apk add --no-cache git
 
 WORKDIR /app
 
+# Установим модули зависимостей
 COPY go.mod go.sum ./
 RUN go mod download
 
