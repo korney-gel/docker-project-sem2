@@ -30,7 +30,6 @@ ENV NODE_OPTIONS=--openssl-legacy-provider
 
 COPY package*.json ./
 RUN npm ci
-
 COPY . .
 EXPOSE 5173
 CMD ["npm", "run", "serve", "--", "--host", "0.0.0.0", "--port", "5173"]
